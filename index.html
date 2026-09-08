@@ -23,14 +23,14 @@
       <div class="panel-head"><h2>🎡 What are we playing?</h2><button class="small-btn" id="historyBtn">Spin history</button></div>
       <div class="panel-body">
         <div class="wheel-wrap"><div class="wheel-box"><div class="pointer"></div><canvas id="wheel" width="760" height="760"></canvas><div class="hub">SPIN</div></div></div>
-        <button class="spin" id="spin">SPIN THE BACKLOG</button>
+        <div class="wheel-actions"><button class="spin" id="spin">SPIN THE BACKLOG</button><button class="randomize" id="randomize">RANDOMIZE</button></div>
         <div class="result" id="result"><img id="resultImg"><div><h3 id="resultName"></h3><small id="resultMeta"></small></div><div class="actions"><button class="icon-btn" id="openSteam">Steam</button><button class="icon-btn" id="reroll">↻</button></div></div>
         <div style="height:14px"></div>
         <div class="filters">
           <div class="field"><label>PLAYTIME</label><select id="playFilter"><option value="under2">Under 2 hours</option><option value="unplayed">Never played</option><option value="under5">Under 5 hours</option><option value="under10">Under 10 hours</option><option value="all">Everything</option></select></div>
           <div class="field"><label>MIN. STEAMDB RATING</label><input id="ratingFilter" type="number" min="0" max="100" value="80"></div>
           <div class="field"><label>TIER</label><select id="tierFilter"><option value="all">All tiers</option><option value="must">MUST PLAY</option><option value="taste">Definitely your taste</option><option value="try">Try it</option><option value="skip">Probably skip</option><option value="played">Played enough</option></select></div>
-          <div class="field"><label>WHEEL SIZE</label><select id="wheelSize"><option>12</option><option selected>20</option><option>30</option><option>50</option></select></div>
+          <div class="field"><label>WHEEL SIZE</label><select id="wheelSize"><option value="12">12</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option><option value="100">100</option><option value="150">150</option><option value="300">300</option><option value="all">ALL</option></select></div>
         </div>
         <div class="checkrow"><label><input type="checkbox" id="favoritesOnly"> Favorites only</label><label><input type="checkbox" id="coopOnly"> Co-op / multiplayer hints</label><label><input type="checkbox" id="weighted" checked> Weight better matches</label></div>
         <div class="pool" id="poolText"></div>
