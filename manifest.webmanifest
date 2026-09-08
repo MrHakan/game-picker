@@ -1,0 +1,15 @@
+{
+  "name": "MrHakan Game Picker",
+  "short_name": "Game Picker",
+  "description": "A personal Steam backlog decision engine with smart wheels, sessions, challenges and offline mode.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#091018",
+  "theme_color": "#091018",
+  "orientation": "any",
+  "categories": ["games", "utilities"],
+  "icons": [
+    {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}
