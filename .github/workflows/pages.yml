@@ -15,7 +15,30 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: node --check app.js
+      - name: Check referenced UI elements
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          js = Path('app.js').read_text(encoding='utf-8')
+          html = Path('index.html').read_text(encoding='utf-8')
+          ids = set(re.findall(r"\$\('#([^']+)'\)", js))
+          html_ids = set(re.findall(r'id="([^"]+)"', html))
+          missing = sorted(ids - html_ids)
+          if missing:
+              raise SystemExit('Missing HTML ids used by app.js: ' + ', '.join(missing))
+          print(f'Validated {len(ids)} referenced UI ids')
+          PY
+
   deploy:
+    needs: validate
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
