@@ -21,8 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Check JavaScript syntax
-        run: node --check app.js
-      - name: Check referenced UI elements
+        run: |
+          node --check app.js
+          node --check meta-features.js
+          node --check sw.js
+      - name: Check referenced UI elements and PWA files
         run: |
           python - <<'PY'
           import re
@@ -34,7 +37,13 @@ jobs:
           missing = sorted(ids - html_ids)
           if missing:
               raise SystemExit('Missing HTML ids used by app.js: ' + ', '.join(missing))
-          print(f'Validated {len(ids)} referenced UI ids')
+          required = ['manifest.webmanifest','icon.svg','meta-features.css','meta-features.js','sw.js']
+          absent = [p for p in required if not Path(p).exists()]
+          if absent:
+              raise SystemExit('Missing command-center/PWA files: ' + ', '.join(absent))
+          if 'meta-features.js' not in html or 'manifest.webmanifest' not in html:
+              raise SystemExit('Command center or PWA manifest is not loaded by index.html')
+          print(f'Validated {len(ids)} core UI ids and PWA assets')
           PY
 
   deploy:
