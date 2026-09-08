@@ -29,7 +29,7 @@ jobs:
           from pathlib import Path
           js = Path('app.js').read_text(encoding='utf-8')
           html = Path('index.html').read_text(encoding='utf-8')
-          ids = set(re.findall(r"\$\('#([^']+)'\)", js))
+          ids = set(re.findall(r"\$\('#([A-Za-z0-9_-]+)", js))
           html_ids = set(re.findall(r'id="([^"]+)"', html))
           missing = sorted(ids - html_ids)
           if missing:
