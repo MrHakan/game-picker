@@ -3,62 +3,95 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#091018" />
 <title>MrHakan · Steam Backlog Picker</title>
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-theme="steam">
+<canvas id="confettiCanvas" aria-hidden="true"></canvas>
 <div class="app">
-  <div class="top">
-    <div class="brand"><h1>Steam Backlog Picker</h1><p>MrHakan's library · turn the backlog into a decision.</p></div>
-    <div class="steam-pill">SteamID64 · 76561198301409570</div>
-  </div>
-  <div class="stats">
+  <header class="top">
+    <div class="brand"><h1>Steam Backlog Picker</h1><p>MrHakan's personal “what do I play?” decision engine.</p></div>
+    <div class="top-tools">
+      <button class="small-btn" id="jailBtn">🚔 Game Jail <span id="jailCount">0</span></button>
+      <button class="small-btn" id="historyBtn">History</button>
+      <div class="steam-pill">SteamID64 · 76561198301409570</div>
+    </div>
+  </header>
+
+  <section class="stats">
     <div class="stat"><b id="sGames"></b><span>SteamDB entries</span></div>
     <div class="stat"><b id="sHours"></b><span>hours played</span></div>
-    <div class="stat"><b id="sUnplayed"></b><span>never launched</span></div>
-    <div class="stat"><b id="sPool"></b><span>currently on the wheel</span></div>
-  </div>
+    <div class="stat"><b id="sProgress"></b><span>app-tracked unplayed</span></div>
+    <div class="stat"><b id="sPool"></b><span>currently on wheel</span></div>
+  </section>
+
+  <section class="decision-bar panel">
+    <div class="panel-head"><h2>Tonight setup</h2><div class="decision-summary" id="decisionSummary"></div></div>
+    <div class="decision-grid">
+      <div class="control-group wide"><label>TONIGHT MODE</label><div class="segmented" id="timeMode">
+        <button data-value="any" class="active">Any</button><button data-value="30">30m</button><button data-value="60">1h</button><button data-value="180">2–3h</button><button data-value="night">All Night</button>
+      </div></div>
+      <div class="control-group wide"><label>MOOD</label><div class="segmented wrap" id="moodMode">
+        <button data-value="any" class="active">Anything</button><button data-value="chill">Chill</button><button data-value="sweat">Sweat</button><button data-value="story">Story</button><button data-value="explore">Exploration</button><button data-value="brainoff">Brain Off</button><button data-value="souls">Souls Pain</button><button data-value="multi">Multiplayer</button>
+      </div></div>
+      <div class="control-group"><label>RISK LEVEL</label><select id="riskLevel"><option value="safe">Safe Pick</option><option value="balanced" selected>Balanced</option><option value="wildcard">Wildcard</option><option value="chaos">Chaos</option></select></div>
+      <div class="control-group"><label>SPECIAL MODE</label><select id="specialMode"><option value="none">None</option><option value="archaeology">Backlog Archaeology</option><option value="hidden">Hidden Gem</option><option value="finish">Finish What You Started</option></select></div>
+      <div class="control-group"><label>RECENT PICK PROTECTION</label><select id="recentProtection"><option value="0">Off</option><option value="10" selected>Last 10</option><option value="20">Last 20</option></select></div>
+      <div class="control-group"><label>COOLDOWN WHEN “NOT TODAY”</label><select id="cooldownDuration"><option value="1">1 day</option><option value="7" selected>1 week</option><option value="30">1 month</option></select></div>
+      <div class="control-group"><label>WHEEL THEME</label><select id="themeSelect"><option value="steam">Steam</option><option value="bonfire">Dark Souls · Bonfire</option><option value="casino">Casino</option><option value="retro">Retro Arcade</option></select></div>
+      <div class="control-group"><label>PRESET</label><select id="presetSelect"><option value="">Choose preset…</option><option value="souls">Souls Night</option><option value="strategy">Strategy Night</option><option value="medieval">Medieval</option><option value="sandbox">Sandbox</option><option value="story">Story Game</option><option value="coop">Co-op</option><option value="hidden">Hidden Gem</option></select></div>
+      <div class="toggle-group"><label><input type="checkbox" id="noReroll"> 🔒 No Reroll · 30m commitment</label><label><input type="checkbox" id="soundEnabled" checked> 🔊 Sound</label></div>
+    </div>
+  </section>
+
   <div class="layout">
-    <section class="panel">
-      <div class="panel-head"><h2>🎡 What are we playing?</h2><button class="small-btn" id="historyBtn">Spin history</button></div>
+    <section class="panel wheel-panel">
+      <div class="panel-head"><h2>🎡 What are we playing?</h2><div class="mini-actions"><button class="small-btn" id="draftBtn">PICK 3</button><button class="small-btn" id="pinnedWheelBtn">📌 Pinned Wheel</button></div></div>
       <div class="panel-body">
+        <div class="commitment" id="commitmentBar"><strong>NO REROLL ACTIVE</strong><span id="commitmentText"></span></div>
         <div class="wheel-wrap"><div class="wheel-box"><div class="pointer"></div><canvas id="wheel" width="760" height="760"></canvas><div class="hub">SPIN</div></div></div>
         <div class="wheel-actions"><button class="spin" id="spin">SPIN THE BACKLOG</button><button class="randomize" id="randomize">RANDOMIZE</button></div>
-        <div class="result" id="result"><img id="resultImg"><div><h3 id="resultName"></h3><small id="resultMeta"></small></div><div class="actions"><button class="icon-btn" id="openSteam">Steam</button><button class="icon-btn" id="reroll">↻</button></div></div>
-        <div style="height:14px"></div>
+
+        <div class="result" id="result">
+          <img id="resultImg" alt="Selected game cover">
+          <div class="result-main"><div class="result-flags" id="resultFlags"></div><h3 id="resultName"></h3><small id="resultMeta"></small></div>
+          <div class="actions"><button class="icon-btn" id="openSteam">Steam</button><button class="icon-btn" id="pinResult" title="Pin">📌</button><button class="icon-btn" id="shareResult" title="Share PNG">Share</button><button class="icon-btn" id="reroll" title="Reroll">↻</button></div>
+        </div>
+        <div class="feedback" id="feedbackBar">
+          <button data-feedback="play">▶ Play</button><button data-feedback="love">❤ Loved it</button><button data-feedback="skip">✕ Skip</button><button data-feedback="notToday">⏳ Not today</button>
+          <select id="statusSelect"><option value="unplayed">Unplayed</option><option value="tried">Tried</option><option value="playing">Playing</option><option value="finished">Finished</option><option value="dropped">Dropped</option></select>
+        </div>
+
         <div class="filters">
           <div class="field"><label>PLAYTIME</label><select id="playFilter"><option value="under2">Under 2 hours</option><option value="unplayed">Never played</option><option value="under5">Under 5 hours</option><option value="under10">Under 10 hours</option><option value="all">Everything</option></select></div>
           <div class="field"><label>MIN. STEAMDB RATING</label><input id="ratingFilter" type="number" min="0" max="100" value="80"></div>
           <div class="field"><label>TIER</label><select id="tierFilter"><option value="all">All tiers</option><option value="must">MUST PLAY</option><option value="taste">Definitely your taste</option><option value="try">Try it</option><option value="skip">Probably skip</option><option value="played">Played enough</option></select></div>
           <div class="field"><label>WHEEL SIZE</label><select id="wheelSize"><option value="12">12</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option><option value="100">100</option><option value="150">150</option><option value="300">300</option><option value="all">ALL</option></select></div>
         </div>
-        <div class="checkrow"><label><input type="checkbox" id="favoritesOnly"> Favorites only</label><label><input type="checkbox" id="coopOnly"> Co-op / multiplayer hints</label><label><input type="checkbox" id="weighted" checked> Weight better matches</label></div>
+        <div class="checkrow"><label><input type="checkbox" id="favoritesOnly"> Favorites only</label><label><input type="checkbox" id="pinnedOnly"> Pinned only</label><label><input type="checkbox" id="coopOnly"> Co-op / multiplayer hints</label><label><input type="checkbox" id="weighted" checked> Smart weight learning</label></div>
         <div class="pool" id="poolText"></div>
       </div>
     </section>
-    <section class="panel">
-      <div class="panel-head"><h2>Backlog tiers</h2><div class="right-tools"><input class="search" id="search" placeholder="Search 951 games…"><button class="small-btn" id="resetBtn">Reset</button></div></div>
+
+    <section class="panel backlog-panel">
+      <div class="panel-head"><h2>Backlog</h2><div class="right-tools"><input class="search" id="search" placeholder="Search 951 games…"><button class="small-btn" id="resetBtn">Reset</button></div></div>
+      <div class="progress-strip"><span>Backlog progress</span><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><b id="progressLabel"></b></div>
       <div class="tabs" id="tabs"></div>
       <div class="list" id="list"></div>
     </section>
   </div>
-  <div class="foot">Generated from your saved SteamDB Calculator page. Rating is SteamDB's displayed rating; tiers are local recommendations and can be overridden with favorites.</div>
+
+  <footer class="foot">SteamDB snapshot + local heuristics + your decisions. All learning/progress data stays in this browser via localStorage.</footer>
 </div>
-<div class="modal" id="historyModal"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center"><h3>Spin history</h3><button class="small-btn" id="closeHistory">Close</button></div><div id="historyList"></div><button class="small-btn" id="clearHistory" style="margin-top:14px">Clear history</button></div></div>
+
+<div class="modal" id="historyModal"><div class="modal-card"><div class="modal-head"><h3>Spin history</h3><button class="small-btn" data-close="historyModal">Close</button></div><div id="historyList"></div><button class="small-btn" id="clearHistory">Clear history</button></div></div>
+<div class="modal" id="jailModal"><div class="modal-card"><div class="modal-head"><h3>🚔 Game Jail</h3><button class="small-btn" data-close="jailModal">Close</button></div><p class="muted">Games you keep dodging. Five dodges earns the sentence.</p><div id="jailList"></div></div></div>
+<div class="modal" id="draftModal"><div class="modal-card draft-card"><div class="modal-head"><h3>3 Game Draft</h3><button class="small-btn" data-close="draftModal">Close</button></div><div class="draft-grid" id="draftGrid"></div><button class="spin" id="finalSpin">FINAL SPIN</button></div></div>
+<div class="reveal" id="reveal"><button class="reveal-close" id="revealClose">×</button><div class="reveal-card"><span id="revealKicker">TONIGHT'S PICK</span><img id="revealImg" alt=""><h2 id="revealName"></h2><p id="revealMeta"></p></div></div>
+
 <script src="stats.js"></script>
-<script src="data-01.js"></script>
-<script src="data-02.js"></script>
-<script src="data-03.js"></script>
-<script src="data-04.js"></script>
-<script src="data-05.js"></script>
-<script src="data-06.js"></script>
-<script src="data-07.js"></script>
-<script src="data-08.js"></script>
-<script src="data-09.js"></script>
-<script src="data-10.js"></script>
-<script src="data-11.js"></script>
-<script src="data-12.js"></script>
-<script src="data-13.js"></script>
+<script src="data-01.js"></script><script src="data-02.js"></script><script src="data-03.js"></script><script src="data-04.js"></script><script src="data-05.js"></script><script src="data-06.js"></script><script src="data-07.js"></script><script src="data-08.js"></script><script src="data-09.js"></script><script src="data-10.js"></script><script src="data-11.js"></script><script src="data-12.js"></script><script src="data-13.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
