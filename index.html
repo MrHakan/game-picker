@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>MrHakan · Steam Backlog Picker</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><h1>Steam Backlog Picker</h1><p>MrHakan's library · turn the backlog into a decision.</p></div>
+    <div class="steam-pill">SteamID64 · 76561198301409570</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="sGames"></b><span>SteamDB entries</span></div>
+    <div class="stat"><b id="sHours"></b><span>hours played</span></div>
+    <div class="stat"><b id="sUnplayed"></b><span>never launched</span></div>
+    <div class="stat"><b id="sPool"></b><span>currently on the wheel</span></div>
+  </div>
+  <div class="layout">
+    <section class="panel">
+      <div class="panel-head"><h2>🎡 What are we playing?</h2><button class="small-btn" id="historyBtn">Spin history</button></div>
+      <div class="panel-body">
+        <div class="wheel-wrap"><div class="wheel-box"><div class="pointer"></div><canvas id="wheel" width="760" height="760"></canvas><div class="hub">SPIN</div></div></div>
+        <button class="spin" id="spin">SPIN THE BACKLOG</button>
+        <div class="result" id="result"><img id="resultImg"><div><h3 id="resultName"></h3><small id="resultMeta"></small></div><div class="actions"><button class="icon-btn" id="openSteam">Steam</button><button class="icon-btn" id="reroll">↻</button></div></div>
+        <div style="height:14px"></div>
+        <div class="filters">
+          <div class="field"><label>PLAYTIME</label><select id="playFilter"><option value="under2">Under 2 hours</option><option value="unplayed">Never played</option><option value="under5">Under 5 hours</option><option value="under10">Under 10 hours</option><option value="all">Everything</option></select></div>
+          <div class="field"><label>MIN. STEAMDB RATING</label><input id="ratingFilter" type="number" min="0" max="100" value="80"></div>
+          <div class="field"><label>TIER</label><select id="tierFilter"><option value="all">All tiers</option><option value="must">MUST PLAY</option><option value="taste">Definitely your taste</option><option value="try">Try it</option><option value="skip">Probably skip</option><option value="played">Played enough</option></select></div>
+          <div class="field"><label>WHEEL SIZE</label><select id="wheelSize"><option>12</option><option selected>20</option><option>30</option><option>50</option></select></div>
+        </div>
+        <div class="checkrow"><label><input type="checkbox" id="favoritesOnly"> Favorites only</label><label><input type="checkbox" id="coopOnly"> Co-op / multiplayer hints</label><label><input type="checkbox" id="weighted" checked> Weight better matches</label></div>
+        <div class="pool" id="poolText"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Backlog tiers</h2><div class="right-tools"><input class="search" id="search" placeholder="Search 951 games…"><button class="small-btn" id="resetBtn">Reset</button></div></div>
+      <div class="tabs" id="tabs"></div>
+      <div class="list" id="list"></div>
+    </section>
+  </div>
+  <div class="foot">Generated from your saved SteamDB Calculator page. Rating is SteamDB's displayed rating; tiers are local recommendations and can be overridden with favorites.</div>
+</div>
+<div class="modal" id="historyModal"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center"><h3>Spin history</h3><button class="small-btn" id="closeHistory">Close</button></div><div id="historyList"></div><button class="small-btn" id="clearHistory" style="margin-top:14px">Clear history</button></div></div>
+<script src="stats.js"></script>
+<script src="games-01.js"></script>
+<script src="games-02.js"></script>
+<script src="games-03.js"></script>
+<script src="games-04.js"></script>
+<script src="games-05.js"></script>
+<script src="games-06.js"></script>
+<script src="games-07.js"></script>
+<script src="games-08.js"></script>
+<script src="games-09.js"></script>
+<script src="games-10.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
